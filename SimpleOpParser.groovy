@@ -101,13 +101,13 @@ public class SimpleOpParser{
         def buttonDetails = [:]
         
         if (buttonItem.split(",").length > 0) {
-            buttonDetails.title = buttonItem.split(",")[0]
+            buttonDetails.title = buttonItem.split(",")[0].trim()
         }
         if (buttonItem.split(",").length > 1) {
-            buttonDetails.url = buttonItem.split(",")[1]
+            buttonDetails.url = buttonItem.split(",")[1].trim()
         }
         if (buttonItem.split(",").length > 2) {
-            buttonDetails.target = buttonItem.split(",")[2]
+            buttonDetails.target = buttonItem.split(",")[2].trim()
         }
         
         return buttonDetails
@@ -274,7 +274,7 @@ public class SimpleOpParser{
         				def link_items = []
         				for(item in entry.getValue().split("\\|")){
 			
-        					link_items << ["title":item.split(",")[0],"url":item.split(",")[1]]
+        					link_items << ["title":item.split(",")[0].trim(),"url":item.split(",")[1].trim()]
 			
         				}
         				mCard.link_items = link_items;
