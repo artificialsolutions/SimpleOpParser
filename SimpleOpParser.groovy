@@ -1,5 +1,5 @@
 // Name: SimpleOpParser
-// Version: 1.0.0
+// Version: 1.1.0
 // Description: Helper class for Teneo Web Chat for easy message type creation in Teneo Studio.
 // Homepage: https://developers.artificial-solutions.com/engine/teneo-web-chat/easy-message-type-creation-in-studio
 
@@ -29,6 +29,19 @@ public class SimpleOpParser{
         button_map.button_items = button_items
 
         return button_map
+    }
+    
+    // LINKBUTTONS
+    public static Map createLinkButtonItems(def buttons = ""){
+        def linkbutton_items = []
+        def linkbutton_map = [:]
+        for(item in buttons.split("\\|").toList()){
+            linkbutton_items << parseLinkButtonDetails(item)
+        }
+        linkbutton_map.type = "linkbuttons"
+        linkbutton_map.linkbutton_items = linkbutton_items
+
+        return linkbutton_map
     }
 
     // CLICKABLE LSITS
@@ -83,17 +96,34 @@ public class SimpleOpParser{
         return text_bubble;
     }
 	
+    public static Map parseLinkButtonDetails(def buttonItem = "") {
+    
+        def buttonDetails = [:]
+        
+        if (buttonItem.split(",").length > 0) {
+            buttonDetails.title = buttonItem.split(",")[0]
+        }
+        if (buttonItem.split(",").length > 1) {
+            buttonDetails.url = buttonItem.split(",")[1]
+        }
+        if (buttonItem.split(",").length > 2) {
+            buttonDetails.target = buttonItem.split(",")[2]
+        }
+        
+        return buttonDetails
+    }
 	
 	// POSTPROCESSING PARSE PARAMS
 	public static void parseParams(def _) {
         // Simple OP
-        def lOpItemTypes = ["quickreply","buttons","clickablelist","video","audio","image","system","text"]
+        def lOpItemTypes = ["quickreply","buttons","linkbuttons","clickablelist","video","audio","image","system","text"]
         def lOpItems = []
         def lComboOrder = []
         def mModal = [:]
         def mCard = [:]
         def sClickableListTitle = ""
         def sButtonsTitle = ""
+        def sLinkButtonsTitle = ""
 
         // Search for simple OPs and convert to JSON
         Iterator it = _.getOutputParameters().entrySet().iterator();
@@ -111,6 +141,10 @@ public class SimpleOpParser{
         			case "buttons":
         				lOpItems << SimpleOpParser.createButtonItems(entry.getValue());
         				break;
+                        
+            		case "linkbuttons":
+            			lOpItems << SimpleOpParser.createLinkButtonItems(entry.getValue());
+            			break;
 
         			case "clickablelist":
         				lOpItems << SimpleOpParser.createClickablelistItems(entry.getValue());
@@ -245,6 +279,16 @@ public class SimpleOpParser{
         				}
         				mCard.link_items = link_items;
         				break;
+                    
+        			case "card_linkbuttons":
+        				def linkbutton_items = []
+        				for(item in entry.getValue().split("\\|")){
+		
+        					linkbutton_items << parseLinkButtonDetails(item)
+		
+        				}
+        				mCard.linkbutton_items = linkbutton_items;
+        				break;
 				
         		}
 		
@@ -265,6 +309,11 @@ public class SimpleOpParser{
         		sButtonsTitle = entry.getValue();
         		it.remove();
 		
+        	} else if (entry.getKey() == "linkbuttons_title"){
+		
+        		sLinkButtonsTitle = entry.getValue();
+        		it.remove();
+		
         	}
 	
         }
@@ -274,7 +323,7 @@ public class SimpleOpParser{
         if(!mCard.isEmpty()) lOpItems << mCard;
 
         // Attach button title and list title to buttons and list
-        if(sClickableListTitle||sButtonsTitle){
+        if(sClickableListTitle||sButtonsTitle||sLinkButtonsTitle){
 	
         	for(item in lOpItems){
 		
@@ -285,6 +334,10 @@ public class SimpleOpParser{
         		} else if (item.type == "buttons"){
 			
         			if(sButtonsTitle) item.title = sButtonsTitle;
+			
+        		} else if (item.type == "linkbuttons"){
+			
+        			if(sLinkButtonsTitle) item.title = sLinkButtonsTitle;
 			
         		}
 		
