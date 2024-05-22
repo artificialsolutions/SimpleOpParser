@@ -1,7 +1,7 @@
 // Name: SimpleOpParser
 // Version: 1.1.1
 // Description: Helper class for Teneo Web Chat for easy message type creation in Teneo Studio.
-// Homepage: https://developers.artificial-solutions.com/engine/teneo-web-chat/easy-message-type-creation-in-studio
+// Homepage: https://developers.teneo.ai/resource/channels/easy-message-type-creation-in-studio
 
 public class SimpleOpParser {
 
